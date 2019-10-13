@@ -144,4 +144,19 @@ class TaskControllerTest extends TestCase
         $this->assertSame($title, $task->title);
         $this->assertSame((string)$remindAt, (string)$task->remind_at);
     }
+
+    public function testDestroyNotFound(): void
+    {
+        $this->delete('/tasks/1')->assertResponseStatus(404);
+    }
+
+    public function testDestroy(): void
+    {
+        /** @var Task $task */
+        $task = factory(Task::class)->create();
+
+        $this->delete('/tasks/' . $task->id)->assertResponseOk();
+
+        $this->missingFromDatabase('tasks', ['id' => $task->id]);
+    }
 }
