@@ -12,7 +12,7 @@ use Illuminate\Support\Carbon;
  *
  * @property int $id
  * @property string $title
- * @property string $remind_at
+ * @property Carbon|null $remind_at
  * @property Carbon|null $created_at
  * @property Carbon|null $updated_at
  * @method static Builder|Task newModelQuery()
@@ -27,5 +27,5 @@ use Illuminate\Support\Carbon;
  */
 class Task extends Model
 {
-
+    protected $dates = ['remind_at'];
 }
