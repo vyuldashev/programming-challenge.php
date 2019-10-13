@@ -86,4 +86,62 @@ class TaskControllerTest extends TestCase
             'remind_at' => $remindAt,
         ]);
     }
+
+    public function testUpdateTaskNotFound(): void
+    {
+        $this
+            ->put('/tasks/1', ['title' => 'foo'])
+            ->assertResponseStatus(404);
+    }
+
+    public function testUpdate(): void
+    {
+        /** @var Task $task */
+        $task = factory(Task::class)->create();
+
+        $title = 'foo';
+
+        $this
+            ->put('/tasks/' . $task->id, ['title' => $title])
+            ->assertResponseOk();
+
+        $this->seeJson([
+            'id' => $task->id,
+            'title' => $title,
+            'remind_at' => null,
+            'created_at' => (string)$task->created_at,
+            'updated_at' => (string)$task->updated_at,
+        ]);
+
+        $task->refresh();
+
+        $this->assertSame($title, $task->title);
+        $this->assertNull($task->remind_at);
+    }
+
+    public function testUpdateWithRemindAt(): void
+    {
+        /** @var Task $task */
+        $task = factory(Task::class)->create();
+
+        $title = 'Pay bills';
+        $remindAt = Carbon::now()->addSecond();
+
+        $this
+            ->put('/tasks/' . $task->id, ['title' => $title, 'remind_at' => (string)$remindAt])
+            ->assertResponseOk();
+
+        $this->seeJson([
+            'id' => $task->id,
+            'title' => $title,
+            'remind_at' => (string)$remindAt,
+            'created_at' => (string)$task->created_at,
+            'updated_at' => (string)$task->updated_at,
+        ]);
+
+        $task->refresh();
+
+        $this->assertSame($title, $task->title);
+        $this->assertSame((string)$remindAt, (string)$task->remind_at);
+    }
 }

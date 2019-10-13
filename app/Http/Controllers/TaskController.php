@@ -33,4 +33,28 @@ class TaskController extends Controller
 
         return $task;
     }
+
+    public function update(Request $request, int $taskId): Task
+    {
+        /** @var Task $task */
+        $task = Task::findOrFail($taskId);
+
+        $this->validate($request, [
+            'title' => [
+                'required',
+                'string',
+            ],
+            'remind_at' => [
+                'nullable',
+                'date',
+                'after:now',
+            ],
+        ]);
+
+        $task->title = $request->input('title');
+        $task->remind_at = $request->input('remind_at');
+        $task->save();
+
+        return $task;
+    }
 }

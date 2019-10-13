@@ -19,3 +19,4 @@ $router->get('/', static function () use ($router) {
 
 $router->get('/tasks', 'TaskController@index');
 $router->post('/tasks', 'TaskController@store');
+$router->put('/tasks/{taskId}', 'TaskController@update');
