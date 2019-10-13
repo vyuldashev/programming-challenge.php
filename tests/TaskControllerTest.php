@@ -10,6 +10,39 @@ class TaskControllerTest extends TestCase
 {
     use DatabaseTransactions;
 
+    public function testIndex(): void
+    {
+        factory(Task::class, 30)->create();
+
+        $this->get('/tasks');
+
+        $this->assertResponseOk();
+
+        $this->seeJsonStructure([
+            'current_page',
+            'data' => [
+                [
+                    'id',
+                    'title',
+                    'remind_at',
+                    'created_at',
+                    'updated_at',
+                ],
+            ],
+            'first_page_url',
+            'from',
+            'next_page_url',
+            'path',
+            'per_page',
+            'prev_page_url',
+            'to',
+        ]);
+
+        $actual = json_decode($this->response->getContent(), true);
+
+        $this->assertCount(15, $actual['data']);
+    }
+
     public function testStore(): void
     {
         $title = 'Buy a milk';
@@ -25,11 +58,10 @@ class TaskControllerTest extends TestCase
             'remind_at' => null,
         ]);
 
-        $task = Task::first();
-
-        $this->assertNotNull($task);
-        $this->assertSame($title, $task->title);
-        $this->assertNull($task->remind_at);
+        $this->seeInDatabase('tasks', [
+            'title' => $title,
+            'remind_at' => null,
+        ]);
     }
 
     public function testStoreWithReminder(): void
@@ -49,10 +81,9 @@ class TaskControllerTest extends TestCase
             'remind_at' => $remindAt,
         ]);
 
-        $task = Task::first();
-
-        $this->assertNotNull($task);
-        $this->assertSame($title, $task->title);
-        $this->assertSame($remindAt, (string)$task->remind_at);
+        $this->seeInDatabase('tasks', [
+            'title' => $title,
+            'remind_at' => $remindAt,
+        ]);
     }
 }

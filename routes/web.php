@@ -11,12 +11,11 @@
 |
 */
 
-/** @var Router $router */
+/** @var Laravel\Lumen\Routing\Router $router */
 
-use Laravel\Lumen\Routing\Router;
-
-$router->get('/', function () use ($router) {
+$router->get('/', static function () use ($router) {
     return $router->app->version();
 });
 
+$router->get('/tasks', 'TaskController@index');
 $router->post('/tasks', 'TaskController@store');

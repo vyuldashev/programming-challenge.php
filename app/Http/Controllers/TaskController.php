@@ -7,6 +7,11 @@ use Illuminate\Http\Request;
 
 class TaskController extends Controller
 {
+    public function index()
+    {
+        return Task::latest()->simplePaginate();
+    }
+
     public function store(Request $request): Task
     {
         $this->validate($request, [
