@@ -4,11 +4,11 @@ namespace Tests;
 
 use App\Models\Task;
 use Carbon\Carbon;
-use Laravel\Lumen\Testing\DatabaseTransactions;
+use Laravel\Lumen\Testing\DatabaseMigrations;
 
 class TaskControllerTest extends TestCase
 {
-    use DatabaseTransactions;
+    use DatabaseMigrations;
 
     public function testIndex(): void
     {
@@ -19,23 +19,30 @@ class TaskControllerTest extends TestCase
         $this->assertResponseOk();
 
         $this->seeJsonStructure([
-            'current_page',
+            'meta' => [
+                'current_page',
+                'per_page',
+            ],
+            'links' => [
+                'first',
+                'next',
+            ],
             'data' => [
                 [
+                    'type',
                     'id',
-                    'title',
-                    'remind_at',
-                    'created_at',
-                    'updated_at',
+                    'attributes' => [
+                        'id',
+                        'title',
+                        'remind_at',
+                        'created_at',
+                        'updated_at',
+                    ],
+                    'links' => [
+                        'self',
+                    ],
                 ],
             ],
-            'first_page_url',
-            'from',
-            'next_page_url',
-            'path',
-            'per_page',
-            'prev_page_url',
-            'to',
         ]);
 
         $actual = json_decode($this->response->getContent(), true);
@@ -53,10 +60,28 @@ class TaskControllerTest extends TestCase
 
         $this->assertResponseOk();
 
+        $this->seeJsonStructure([
+            'data' => [
+                'type',
+                'id',
+                'attributes' => [
+                    'id',
+                    'title',
+                    'remind_at',
+                    'created_at',
+                    'updated_at',
+                ],
+                'links' => [
+                    'self',
+                ],
+            ],
+        ]);
+
         $this->seeJson([
             'title' => $title,
             'remind_at' => null,
         ]);
+
 
         $this->seeInDatabase('tasks', [
             'title' => $title,
@@ -75,6 +100,23 @@ class TaskControllerTest extends TestCase
         ]);
 
         $this->assertResponseOk();
+
+        $this->seeJsonStructure([
+            'data' => [
+                'type',
+                'id',
+                'attributes' => [
+                    'id',
+                    'title',
+                    'remind_at',
+                    'created_at',
+                    'updated_at',
+                ],
+                'links' => [
+                    'self',
+                ],
+            ],
+        ]);
 
         $this->seeJson([
             'title' => $title,
@@ -101,9 +143,26 @@ class TaskControllerTest extends TestCase
 
         $title = 'foo';
 
-        $this
-            ->put('/tasks/' . $task->id, ['title' => $title])
-            ->assertResponseOk();
+        $this->put('/tasks/' . $task->id, ['title' => $title]);
+
+        $this->assertResponseOk();
+
+        $this->seeJsonStructure([
+            'data' => [
+                'type',
+                'id',
+                'attributes' => [
+                    'id',
+                    'title',
+                    'remind_at',
+                    'created_at',
+                    'updated_at',
+                ],
+                'links' => [
+                    'self',
+                ],
+            ],
+        ]);
 
         $this->seeJson([
             'id' => $task->id,
@@ -127,9 +186,26 @@ class TaskControllerTest extends TestCase
         $title = 'Pay bills';
         $remindAt = Carbon::now()->addSecond();
 
-        $this
-            ->put('/tasks/' . $task->id, ['title' => $title, 'remind_at' => (string)$remindAt])
-            ->assertResponseOk();
+        $this->put('/tasks/' . $task->id, ['title' => $title, 'remind_at' => (string)$remindAt]);
+
+        $this->assertResponseOk();
+
+        $this->seeJsonStructure([
+            'data' => [
+                'type',
+                'id',
+                'attributes' => [
+                    'id',
+                    'title',
+                    'remind_at',
+                    'created_at',
+                    'updated_at',
+                ],
+                'links' => [
+                    'self',
+                ],
+            ],
+        ]);
 
         $this->seeJson([
             'id' => $task->id,

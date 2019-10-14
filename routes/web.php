@@ -13,11 +13,11 @@
 
 /** @var Laravel\Lumen\Routing\Router $router */
 
-$router->get('/', static function () use ($router) {
+$router->get('/', function () use ($router) {
     return $router->app->version();
 });
 
-$router->get('/tasks', 'TaskController@index');
-$router->post('/tasks', 'TaskController@store');
-$router->put('/tasks/{taskId}', 'TaskController@update');
-$router->delete('/tasks/{taskId}', 'TaskController@destroy');
+$router->get('/tasks', ['as' => 'tasks.index', 'uses' => 'TaskController@index']);
+$router->post('/tasks', ['as' => 'tasks.create', 'uses' => 'TaskController@store']);
+$router->put('/tasks/{taskId}', ['as' => 'tasks.update', 'uses' => 'TaskController@update']);
+$router->delete('/tasks/{taskId}', ['as' => 'tasks.destroy', 'uses' => 'TaskController@destroy']);
